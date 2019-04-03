@@ -5,11 +5,10 @@ const bodyParser = require('body-parser');
 const port = process.env.PORT || 3001
 
 class Block{
-    constructor(index, previousHash, timestamp, mssv, name, vote, hash){
+    constructor(index, previousHash, timestamp, name, vote, hash){
         this.index = index
         this.previousHash = previousHash.toString()
         this.timestamp = timestamp
-        this.mssv = mssv
         this.name = name
         this.vote = vote
         this.hash = hash.toString()
@@ -17,23 +16,22 @@ class Block{
 }
 
 
-const calculateHash = (index, previousHash, timestamp, mssv, name, vote) =>{
-    return CryptoJS.SHA256(index, previousHash, timestamp, mssv, name, vote).toString()
+const calculateHash = (index, previousHash, timestamp, name, vote) =>{
+    return CryptoJS.SHA256(index, previousHash, timestamp, name, vote).toString()
     }
 
 const calculateHashForBlock = (block) =>{
-    return calculateHash(block.index, block.previousHash, block.timestamp, block.mssv, block.name, block.vote)
+    return calculateHash(block.index, block.previousHash, block.timestamp, block.name, block.vote)
 }
 
 const getRootBlock = () =>{
     index = 0
     previousHash = "0"
     timestamp = Date.now()
-    mssv = "000000000"
     name = "Author - Hieu Nguyen"
     vote = -1
-    hash = calculateHash(index, previousHash, timestamp, mssv, name, vote)
-    return new Block(index, previousHash,timestamp,mssv, name, vote, hash)
+    hash = calculateHash(index, previousHash, timestamp, name, vote)
+    return new Block(index, previousHash,timestamp, name, vote, hash)
 }
 
 const blockchain = [getRootBlock()]
@@ -82,8 +80,8 @@ const generateNextBlock = (blockData) => {
     var previousBlock = getLatestBlock();
     var nextIndex = previousBlock.index + 1;
     var nextTimestamp = new Date().getTime() / 1000;
-    var nextHash = calculateHash(nextIndex, previousBlock.hash, nextTimestamp,blockData.mssv, blockData.name, blockData.vote);
-    return new Block(nextIndex, previousBlock.hash, nextTimestamp,blockData.mssv, blockData.name, blockData.vote, nextHash);
+    var nextHash = calculateHash(nextIndex, previousBlock.hash, nextTimestamp, blockData.name, blockData.vote);
+    return new Block(nextIndex, previousBlock.hash, nextTimestamp, blockData.name, blockData.vote, nextHash);
 };
 
 
@@ -107,11 +105,15 @@ const getLatestBlock = () => blockchain[blockchain.length - 1];
 var chicken = 0;
 var egg = 0;
 const result = () => {
-    blockchain.forEach(element => {
+    chicken = 0;
+    egg = 0;
+    blockchain.forEach(element => { 
         if(element.vote == 0){
+            console.log("element.vote egg :" + typeof(element.vote))
             egg += 1;
         }
         if(element.vote == 1){
+            console.log("element.vote chicken:" + typeof(element.vote))
             chicken += 1;
         }
     });
